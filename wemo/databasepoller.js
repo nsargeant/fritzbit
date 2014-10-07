@@ -56,3 +56,5 @@ function Poller(user) {
     clearInterval(interval);
   };
 }
+
+module.exports = Poller;
