@@ -13,6 +13,9 @@
   "license": "MIT",
   "dependencies": {
     "express": "3.0.0",
-    "fitbit-js": "^0.2.0"
+    "ip": "^0.3.2",
+    "mongoose": "^3.8.17",
+    "passport": "^0.2.1",
+    "passport-fitbit": "^0.1.2"
   }
 }
