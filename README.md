@@ -1,4 +1,4 @@
-posh
+fritzbit
 ====
 
-All things posh
+Fitbit stuff
