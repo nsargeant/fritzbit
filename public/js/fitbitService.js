@@ -6,8 +6,8 @@ app.service('fritzbitService', function ($http) {
     }
 
     this.postStepsPerCredit = function (id, ratio) {
-        console.log('postData() called!');
-        return $http({method: 'POST', url: 'https://127.0.0.1/user/' + id + '/ratio/' + ratio});
+        console.log('postData() called! - id: ', id, ' ratio: ', ratio);
+        return $http({method: 'POST', url: '/user/' + id + '/ratio/' + ratio});
     };
 });
 

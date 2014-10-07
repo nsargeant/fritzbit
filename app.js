@@ -100,7 +100,7 @@ app.get('/fritzbit/data', function(req, res, next) {
   res.send(200, req.user);
 });
 
-app.post('user/:id/ratio/:ratio', function(req, res, next) {
+app.post('/user/:id/ratio/:ratio', function(req, res, next) {
   console.log('adding ratio to user');
   user.getUser(req.params.id, function(err, use) {
     if (err) {
@@ -120,6 +120,7 @@ app.post('user/:id/ratio/:ratio', function(req, res, next) {
           console.log('error saving to database', err);
           res.send(500, err);
         } else {
+          console.log('Saved data! ####################', data);
           res.send(data);
         }
       });
