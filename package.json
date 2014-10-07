@@ -16,6 +16,8 @@
     "ip": "^0.3.2",
     "mongoose": "^3.8.17",
     "passport": "^0.2.1",
-    "passport-fitbit": "^0.1.2"
+    "passport-fitbit": "^0.1.2",
+    "querystring": "^0.2.0",
+    "request": "^2.45.0"
   }
 }
