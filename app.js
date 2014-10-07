@@ -95,6 +95,11 @@ app.get('/login', function(req, res) {
   });
 });
 
+app.get('/fritzbit/data', function(req, res, next) {
+   console.log(req.user);
+    res.send(200, req.user);
+});
+
 app.post('user/:id/ratio/:ratio', function(req, res, next) {
   console.log('adding ratio to user');
   user.getUser(req.params.id, function(err, user) {

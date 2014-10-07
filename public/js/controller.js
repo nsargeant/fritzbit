@@ -6,6 +6,11 @@ app.controller('FritzbitController', function ($scope, fritzbitService) {
         distance: 0.5
     };
 
+    $scope.test = function(){
+        return 'This is a test';
+    };
+
+    $scope.data = {};
     $scope.steps = 0;
     $scope.credits = 0;
     $scope.dirty = false;
@@ -15,7 +20,9 @@ app.controller('FritzbitController', function ($scope, fritzbitService) {
     };
 
     $scope.getData = function() {
-        return fritzbitService.getData();
+        var result = fritzbitService.getData();
+        console.dir('getData result: ' + result);
+        return result;
     };
 
     $scope.postData = function() {
@@ -31,5 +38,6 @@ app.controller('FritzbitController', function ($scope, fritzbitService) {
 
     setInterval(function(){
         $scope.postData();
+        $scope.data = $scope.getData();
     }, 1500);
 });
