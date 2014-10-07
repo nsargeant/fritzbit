@@ -38,6 +38,8 @@ passport.use(new FitbitStrategy({
   function(token, tokenSecret, profile, done) {
 
     // asynchronous verification
+    console.log(token);
+    console.log(tokenSecret);
     user.findOrCreateNewUser(profile, function(err, user) {
       return done(err, user);
     });

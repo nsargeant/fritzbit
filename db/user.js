@@ -1,7 +1,10 @@
 var db = require('./db');
 
 var userSchema = new db.Schema({
-  fitbit: String
+  fitbit: String,
+  info: Object,
+  wemo: Object,
+  website: Object
 });
 
 var User = db.mongoose.model('User', userSchema);
@@ -19,17 +22,15 @@ var User = db.mongoose.model('User', userSchema);
 module.exports.findOrCreateNewUser = function(info, callback) {
   var u = new User();
   u.fitbit = info.id;
-
-  console.log('Saving new user:', u, info);
+  console.log('looking up user', info);
   User.findOne({
     fitbit: info.id
   }, function(err, user) {
-    if (err) {
-
-    }
     if (!user) {
+      console.log('Saving new user:', u);
       u.save(callback);
-    }
+    } else
+      callback(err, user);
   });
 }
 
@@ -55,7 +56,7 @@ module.exports.getAllUsers = function(callback) {
  */
 module.exports.getUser = function(id, callback) {
   User.findOne({
-    _id: id
+    fitbit: id
   }, callback)
 }
 
