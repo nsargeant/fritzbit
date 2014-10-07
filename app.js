@@ -5,8 +5,8 @@ var express = require('express'),
   user = require('./db/user.js'),
   FitbitStrategy = require('passport-fitbit').Strategy;
 
-var port = 3000
-var FITBIT_CONSUMER_KEY = "7088513d14a84b16a93e4ab4775036b4"
+var port = 3000;
+var FITBIT_CONSUMER_KEY = "7088513d14a84b16a93e4ab4775036b4";
 var FITBIT_CONSUMER_SECRET = "1bec8db9c979486995307146559fe649";
 
 
@@ -93,6 +93,31 @@ app.get('/login', function(req, res) {
   res.render('login', {
     user: req.user
   });
+});
+
+app.get('/fritzbit/data', function(req, res, next) {
+   console.log(req.user);
+    res.send(200, req.user);
+});
+
+app.post('user/:id/ratio/:ratio', function(req, res, next) {
+  console.log('adding ratio to user');
+  user.getUser(req.params.id, function(err, user) {
+    if (err) {
+      res.send(500, err);
+    } else {
+      user.website.ratio = req.params.ratio;
+      user.save(function(err, data) {
+        if (err) {
+          console.log('error saving to database', err);
+          res.send(500, err);
+        } else {
+          res.send(data);
+        }
+      });
+    }
+  });
+
 });
 
 // GET /auth/fitbit
