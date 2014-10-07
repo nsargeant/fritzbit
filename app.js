@@ -95,6 +95,11 @@ app.get('/login', function(req, res) {
   });
 });
 
+app.get('/fritzbit/data', function(req, res, next) {
+  console.log(req.user);
+  res.send(200, req.user);
+});
+
 app.get('/user/:user', function(req, res, next) {
   var U = user.User;
   U.findOne({
