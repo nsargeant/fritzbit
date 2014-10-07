@@ -1,56 +1,65 @@
 var request = require('request'),
-  timeout = 30000,
+  qs = require('querystring'),
   user = require('./db/user.js'),
-  users = [],
-  oauth = {};
+  async = require('async');
 
-function getOauthTokens(key, secret, cbUrl cb) {
-  oauth = {
+function Poller() {
+  this.timeout = 30000;
+  this.users = {};
+  this.oauth = {};
+}
+
+Poller.prototype.getOauthTokens = function(key, secret, cbUrl, cb) {
+  var _this = this;
+  _this.oauth = {
     consumer_key: key,
     consumer_secret: secret,
     callback: cbUrl
   }
-  var url = 'https://www.fitbit.com/oauth/authorize?oauth_token='
+  var url = 'https://www.fitbit.com/oauth/request_token'
   request.post({
     url: url,
-    oauth: oauth
+    oauth: _this.oauth
   }, function(e, r, body) {
     if (e) {
       console.log('err:', e);
       cb(e);
     }
-    console.log('res:', r);
-    console.log('body:', body);
 
-    var access_token = qs.parse(body);
-    url = 'https://www.fitbit.com/oauth/authorize?oauth_token=';
+    _this.access_token = qs.parse(body);
+    //console.log('got access_token:', this.access_token);
+    //url = 'https://www.fitbit.com/oauth/authorize?oauth_token=';
     oauth = {
       consumer_key: key,
       consumer_secret: secret,
-      token: access_token.oauth_token,
-      verifier: access_token.oauth_verifier
+      token: _this.access_token.oauth_token,
+      verifier: _this.access_token.oauth_verifier
     };
 
-    //Perm Token
-    request.post({
-      url: url,
-      oauth: oauth
-    }, function(e, r, body) {
+    cb(null, oauth);
 
-      var perm_token = qs.parse(body);
-      oauth = {
-        consumer_key: key,
-        consumer_secret: secret,
-        token: perm_token.oauth_token,
-        token_secret: perm_token.oauth_token_secret
-      },
-      console.log('Got perm_token:', perm_token);
-      cb(null, oauth);
-    });
+    //Perm Token
+    // request.post({
+    //   url: url,
+    //   oauth: oauth
+    // }, function(e, r, b) {
+    //   if (e) {
+    //     cb(e);
+    //   }
+    //   var perm_token = qs.parse(b);
+    //   oauth = {
+    //     consumer_key: key,
+    //     consumer_secret: secret,
+    //     token: perm_token.oauth_token,
+    //     token_secret: perm_token.oauth_token_secret
+    //   },
+    //   console.log('Got perm_token:', perm_token);
+    //   cb(null, oauth);
+    // });
   });
 }
 
-function getUserInfo(fitbitId, oauth, cb) {
+Poller.prototype.getUserInfo = function(fitbitId, oauth, cb) {
   request({
     oauth: oauth,
     uri: 'http://api.fitbit.com/1/user/' + fitbitId + '/activities.json',
@@ -58,30 +67,38 @@ function getUserInfo(fitbitId, oauth, cb) {
   }, cb);
 }
 
-function saveUser(argument) {
-  // body...
-}
-
-module.exports.start = function(key, secret, cbUrl) {
-  user.getAllUsers(function(err, usrs) {
+Poller.prototype.start = function(key, secret, cbUrl) {
+  var _this = this;
+  user.getAllUsers(function(err, users) {
     if (err) {
       console.log(err);
     }
-    users = usrs;
+    console.log('got users:', users);
     async.each(users, function(user, cb) {
-      getOauthTokens(key, secret, cbUrl, function(err, oauth) {
+      console.log('getting oauth tokens for user:', user);
+      _this.getOauthTokens(key, secret, cbUrl, function(err, oauth) {
         if (err) {
+          console.log(err);
           cb(err);
         }
-        setInterval(function() {
-          getUserInfo(user.)
-        }, timeout);
+        user.oauth = oauth;
+        cb();
       });
-
     }, function(err) {
       if (err) {
-        console.log(err)
+        console.log(err);
+        setInterval(function() {
+          async.each(users, function(usr, cbb) {
+            _this.getUserInfo(usr.fitbit, usr.oauth, function(err, res, data) {
+              console.log(data);
+              //user.updateUser(user.fitbit, data)
+            });
+          }, function(err2) {
+            console.log(err2);
+          });
+        }, _this.timeout)
       }
     });
   });
 }
+module.exports = new Poller();

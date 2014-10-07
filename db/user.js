@@ -72,7 +72,7 @@ module.exports.getUser = function(id, callback) {
  */
 module.exports.updateUser = function(id, updates, callback) {
   User.update({
-    _id: id
+    fitbit: id
   }, updates, callback);
 }
 

@@ -12,6 +12,7 @@
   "author": "nsargeant",
   "license": "MIT",
   "dependencies": {
+    "async": "^0.9.0",
     "express": "3.0.0",
     "ip": "^0.3.2",
     "mongoose": "^3.8.17",
