@@ -95,7 +95,7 @@ app.get('/login', function(req, res) {
   });
 });
 
-app.post('user/:id/ratio/:ratio', function(req, res, next) {
+app.post('/user/:id/ratio/:ratio', function(req, res, next) {
   console.log('adding ratio to user');
   user.getUser(req.params.id, function(err, user) {
     if (err) {
