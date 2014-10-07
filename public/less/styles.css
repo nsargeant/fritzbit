@@ -1,0 +1,8 @@
+.jumbotron {
+  margin-top: 80px;
+  position: relative;
+}
+.jumbotron ul {
+  list-style-type: none;
+  font-size: 2em;
+}
