@@ -146,7 +146,10 @@ app.get('/auth/fitbit/callback',
     failureRedirect: '/login'
   }),
   function(req, res) {
-    res.redirect('/');
+    console.log('============ we are here= ===========');
+    console.log(req.user);
+    console.log('============ we are here= ===========');
+    res.redirect('/index.html');
   });
 
 app.get('/logout', function(req, res) {

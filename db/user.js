@@ -9,6 +9,8 @@ var userSchema = new db.Schema({
 
 var User = db.mongoose.model('User', userSchema);
 
+module.exports.User = User;
+
 //Create
 
 /**
