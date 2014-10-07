@@ -6,7 +6,7 @@ app.controller('FritzbitController', function ($scope, fritzbitService) {
         distance: 0.5
     };
 
-    $scope.test = function(){
+    $scope.test = function () {
         return 'This is a test';
     };
 
@@ -14,30 +14,41 @@ app.controller('FritzbitController', function ($scope, fritzbitService) {
     $scope.steps = 0;
     $scope.credits = 0;
     $scope.dirty = false;
+    $scope.username = '';
 
-    $scope.flipDirty = function() {
+    $scope.flipDirty = function () {
+        console.log('It\'s dirty');
         $scope.dirty = true;
     };
 
-    $scope.getData = function() {
-        var result = fritzbitService.getData();
-        console.dir('getData result: ' + result);
-        return result;
+    $scope.flipClean = function () {
+        console.log('It\'s clean!');
+        $scope.dirty = false;
     };
 
-    $scope.postData = function() {
+    $scope.getUsername = function () {
+        fritzbitService.getData().then(function (data) {
+            console.log('getData result: ', data);
+            $scope.username = data.data.fitbit;
+            console.log('username: ', $scope.username);
+            $scope.flipDirty();
+        });
+    };
+
+    $scope.postData = function () {
         if ($scope.dirty) {
-            if ($scope.credits) {
-                fritzbitService.postStepsPerCredit(id,$scope.steps);
-            } else {
-                fritzbitService.postStepsPerCredit(0);
-            }
-            $scope.dirty = false;
+            fritzbitService.postStepsPerCredit($scope.username,$scope.steps).then(function(data){
+                console.log('post result: ', data);
+            });
+            $scope.flipClean();
         }
     };
 
-    setInterval(function(){
-        $scope.postData();
-        $scope.data = $scope.getData();
+    setInterval(function () {
+        if (!$scope.username) {
+            $scope.getUsername();
+        } else {
+            //$scope.postData();
+        }
     }, 1500);
 });

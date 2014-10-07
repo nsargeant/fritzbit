@@ -65,8 +65,9 @@
                 </ul>
                 <div>
                     <label>
-                        <input type="text" ng-model="steps"> Steps per Credit
+                        <input type="text" ng-keyup="flipDirty()" ng-model="steps"> Steps per Credit
                     </label>
+                    <button ng-click="postData()">Submit Steps</button>
                 </div>
             </div>
 
