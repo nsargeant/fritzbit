@@ -102,12 +102,20 @@ app.get('/fritzbit/data', function(req, res, next) {
 
 app.post('user/:id/ratio/:ratio', function(req, res, next) {
   console.log('adding ratio to user');
-  user.getUser(req.params.id, function(err, user) {
+  user.getUser(req.params.id, function(err, use) {
     if (err) {
       res.send(500, err);
     } else {
-      user.website.ratio = req.params.ratio;
-      user.save(function(err, data) {
+
+      var U = user.User;
+
+      U.update({
+        fitbit: use.fitbit
+      }, {
+        website: {
+          ratio: req.params.ratio
+        }
+      }, {}, function(err, data) {
         if (err) {
           console.log('error saving to database', err);
           res.send(500, err);
