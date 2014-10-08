@@ -35,22 +35,8 @@ function Poller(use) {
       console.log('sats', u.wemo.earned, u.wemo.used);
       if (u.wemo.earned <= u.wemo.used) {
 
-        manager.getDevices().done(function(d) {
-          console.log('devices to shut down', d, typeof d);
-          for (var x in d) {
-            console.log(x);
-            if (x === 'jive2-wemo-tv') {
-              manager.toggleDevice(x, 'off').fail(function(err) {
-                console.log('oh no there was an error toggling the device');
-              }).done(function() {
-                console.log('turnned off the wemo!');
-                _this.destroy();
-              });
-            }
-          }
-        }).fail(function(err) {
-          console.log('OH NO THERE WAS AN ERROR GETTING DEVICES!', err);
-        });
+        _this.destroy();
+
       } else {
         console.log('incrementing used credits from %s to %s', u.wemo.used, u.wemo.used + 1);
         u.wemo.used += 1;
@@ -90,6 +76,22 @@ function Poller(use) {
     });
   }, 10 * 1000);
   this.destroy = function() {
+    manager.getDevices().done(function(d) {
+      console.log('devices to shut down', d, typeof d);
+      for (var x in d) {
+        console.log(x);
+        if (x === 'jive2-wemo-tv') {
+          manager.toggleDevice(x, 'off').fail(function(err) {
+            console.log('oh no there was an error toggling the device');
+          }).done(function() {
+            console.log('turnned off the wemo!');
+            _this.destroy();
+          });
+        }
+      }
+    }).fail(function(err) {
+      console.log('OH NO THERE WAS AN ERROR GETTING DEVICES!', err);
+    });
     console.log('destroying countdown');
     clearInterval(interval);
   };
