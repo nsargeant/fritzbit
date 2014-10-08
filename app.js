@@ -178,6 +178,7 @@ app.get('/logout', function(req, res) {
 var wemoMap = {};
 
 app.post('/wemo/:id/:state', function(req, res, next) {
+  console.log("=================TURNING THE WEMO ", req.params.state);
   var state = req.params.state;
   var id = req.params.id;
   if (state === "on") {
