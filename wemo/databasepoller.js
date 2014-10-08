@@ -9,50 +9,88 @@ manager.resyncDevices().done(function(data) {
   console.log('there was an error synced', err);
 });
 
-function Poller(user) {
-  var interval = setInterval(function() {
+function Poller(use) {
+  var _this = this;
 
-    user.getUser(user, function(err, user) {
-      if (!user.wemo) {
-        user.wemo = {};
-        user.wemo.used = 0;
+  manager.getDevices().done(function(data) {
+    for (x in data) {
+      if (x === "jive2-wemo-tv") {
+        manager.toggleDevice(x, 'on').fail(function(err) {
+          console.log('oh no there was an error toggling the device');
+        });
       }
-      user.wemo.earned = user.info.sumary.steps / user.website.ratio;
-      if (user.wemo.earned <= user.wemo.used) {
+    }
+  }).fail(function(err) {
+    console.log('OH NO THERE WAS AN ERROR GETTING DEVICES!', err);
+  });
 
-        manager.getDevices().done(function(data) {
-          for (x in data) {
-            manager.toggleDevice(x, 'off').fail(function(err) {
-              console.log('oh no there was an error toggling the device');
-            });
+  var interval = setInterval(function() {
+    user.getUser(use, function(err, u) {
+      if (!u.wemo) {
+        console.log('resetting wemo object');
+        u.wemo = {};
+        u.wemo.used = 0;
+      }
+      u.wemo.earned = u.info.summary.steps / u.website.ratio;
+      console.log('sats', u.wemo.earned, u.wemo.used);
+      if (u.wemo.earned <= u.wemo.used) {
+
+        manager.getDevices().done(function(d) {
+          console.log('devices to shut down', d, typeof d);
+          for (var x in d) {
+            console.log(x);
+            if (x === 'jive2-wemo-tv') {
+              manager.toggleDevice(x, 'off').fail(function(err) {
+                console.log('oh no there was an error toggling the device');
+              }).done(function() {
+                console.log('turnned off the wemo!');
+                _this.destroy();
+              });
+            }
           }
         }).fail(function(err) {
           console.log('OH NO THERE WAS AN ERROR GETTING DEVICES!', err);
         });
       } else {
-        console.log('incrementing used credits from %s to %s', used, used + 1);
-        user.wemo.used += 1;
+        console.log('incrementing used credits from %s to %s', u.wemo.used, u.wemo.used + 1);
+        u.wemo.used += 1;
         console.log('saving user to database');
 
-        user.save(function(err, data) {
+        var updater = {
+          fitbit: u.fitbit,
+          info: u.info,
+          website: u.website,
+          wemo: u.wemo
+        };
+
+        console.log('db object', updater);
+
+        user.User.update({
+          fitbit: use
+        }, updater, {}, function(err, data) {
           if (err) {
             console.log('there was an error saving to the database', err);
+          } else {
+            console.log('saved', data);
           }
         });
 
         manager.getDevices().done(function(data) {
           for (x in data) {
-            manager.toggleDevice(x, 'on').fail(function(err) {
-              console.log('oh no there was an error toggling the device');
-            });
+            if (x === "jive2-wemo-tv") {
+              manager.toggleDevice(x, 'on').fail(function(err) {
+                console.log('oh no there was an error toggling the device');
+              });
+            }
           }
         }).fail(function(err) {
           console.log('OH NO THERE WAS AN ERROR GETTING DEVICES!', err);
         });
       }
     });
-  }, 60 * 1000);
+  }, 10 * 1000);
   this.destroy = function() {
+    console.log('destroying countdown');
     clearInterval(interval);
   };
 }

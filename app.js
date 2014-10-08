@@ -4,7 +4,8 @@ var express = require('express'),
   ip = require('ip'),
   user = require('./db/user.js'),
   Poll = require('./poller.js'),
-  FitbitStrategy = require('passport-fitbit').Strategy;
+  FitbitStrategy = require('passport-fitbit').Strategy,
+  poller = require('./wemo/databasepoller.js');
 
 var port = 3000;
 var FITBIT_CONSUMER_KEY = "7088513d14a84b16a93e4ab4775036b4";
@@ -39,7 +40,7 @@ passport.use(new FitbitStrategy({
   },
   function(token, tokenSecret, profile, done) {
 
-    profile.fitbit_token = token
+    profile.fitbit_token = token;
     profile.fitbit_tokenSecret = tokenSecret;
     user.findOrCreateNewUser(profile, function(err, user) {
       var poll = new Poll(user.fitbit_token);
@@ -164,15 +165,32 @@ app.get('/auth/fitbit/callback',
     failureRedirect: '/login'
   }),
   function(req, res) {
-    console.log('============ we are here= ===========');
-    console.log(req.user);
-    console.log('============ we are here= ===========');
+    console.log(req.user.name);
+
     res.redirect('/index.html');
   });
 
 app.get('/logout', function(req, res) {
   req.logout();
   res.redirect('/');
+});
+
+var wemoMap = {};
+
+app.post('/wemo/:id/:state', function(req, res, next) {
+  var state = req.params.state;
+  var id = req.params.id;
+  if (state === "on") {
+    var ob = wemoMap[id];
+    if (!ob) {
+      wemoMap[id] = new poller(id);
+    }
+  } else {
+    var ob = wemoMap[id];
+    if (ob) {
+      ob.destroy();
+    }
+  }
 });
 
 app.listen(port);
