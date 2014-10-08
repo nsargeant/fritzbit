@@ -85,7 +85,6 @@ function Poller(use) {
             console.log('oh no there was an error toggling the device');
           }).done(function() {
             console.log('turnned off the wemo!');
-            _this.destroy();
           });
         }
       }
