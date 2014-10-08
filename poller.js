@@ -11,8 +11,9 @@ function Poller(token, tokenSecret) {
   this.users = {};
   this.oauth = {
     consumer_key: FITBIT_CONSUMER_KEY,
-    access_token: token,
-
+    token: token,
+    oauth_signature_method: "HMAC-SHA1",
+    oauth_signature: "Gf5NUq1Pvg3DrtxHJyVaMXq4Foo%3D"
     // nonce: uuid.v4(),
     // signature: 'Signature calculated as described in The OAuth 1.0 Protocol Section 3.4: Signature.',
     //signature_method: 'HMAC-SHA1',
@@ -36,6 +37,7 @@ Poller.prototype.start = function(id) {
     if (err) {
       console.log('fitbit error!!!!:', err);
     }
+    console.log('resdude:', res.request.req._header);
     console.log('GOT DATA From fitbit:', data);
   });
   setInterval(function() {
