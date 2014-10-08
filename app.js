@@ -191,6 +191,7 @@ app.post('/wemo/:id/:state', function(req, res, next) {
       ob.destroy();
     }
   }
+  res.send(200);
 });
 
 app.listen(port);
