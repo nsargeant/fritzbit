@@ -3,12 +3,12 @@ var express = require('express'),
   util = require('util'),
   ip = require('ip'),
   user = require('./db/user.js'),
+  Poll = require('./poller.js'),
   FitbitStrategy = require('passport-fitbit').Strategy;
 
 var port = 3000;
 var FITBIT_CONSUMER_KEY = "7088513d14a84b16a93e4ab4775036b4";
 var FITBIT_CONSUMER_SECRET = "1bec8db9c979486995307146559fe649";
-
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -18,10 +18,12 @@ var FITBIT_CONSUMER_SECRET = "1bec8db9c979486995307146559fe649";
 //   have a database of user records, the complete Fitbit profile is serialized
 //   and deserialized.
 passport.serializeUser(function(user, done) {
+  //console.log('serializeUser:', user);
   done(null, user);
 });
 
 passport.deserializeUser(function(obj, done) {
+  //console.log('deserializeUser:', user);
   done(null, obj);
 });
 
@@ -37,23 +39,21 @@ passport.use(new FitbitStrategy({
   },
   function(token, tokenSecret, profile, done) {
 
-    // asynchronous verification
-    console.log(token);
-    console.log(tokenSecret);
+    profile.fitbit_token = token
+    profile.fitbit_tokenSecret = tokenSecret;
     user.findOrCreateNewUser(profile, function(err, user) {
+      var poll = new Poll(user.fitbit_token);
+      poll.start(user.fitbit);
       return done(err, user);
     });
   }
 ));
 
-
-
-
 var app = express();
 
 // configure Express
 app.configure(function() {
-  app.use(express.logger());
+  //app.use(express.logger());
   app.use(express.cookieParser());
   app.use(express.bodyParser());
   app.use(express.methodOverride());
@@ -96,8 +96,8 @@ app.get('/login', function(req, res) {
 });
 
 app.get('/fritzbit/data', function(req, res, next) {
-   console.log(req.user);
-    res.send(200, req.user);
+  console.log(req.user);
+  res.send(200, req.user);
 });
 
 app.post('user/:id/ratio/:ratio', function(req, res, next) {

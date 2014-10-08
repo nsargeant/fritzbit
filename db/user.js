@@ -2,6 +2,8 @@ var db = require('./db');
 
 var userSchema = new db.Schema({
   fitbit: String,
+  fitbit_token: String,
+  fitbit_tokenSecret: String,
   info: Object,
   wemo: Object,
   website: Object
@@ -22,6 +24,8 @@ var User = db.mongoose.model('User', userSchema);
 module.exports.findOrCreateNewUser = function(info, callback) {
   var u = new User();
   u.fitbit = info.id;
+  u.fitbit_token = info.fitbit_token;
+  u.fitbit_tokenSecret = info.fitbit_tokenSecret;
   console.log('looking up user', info);
   User.findOne({
     fitbit: info.id
