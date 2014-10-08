@@ -1,5 +1,5 @@
 var WemoManager = require('./wemoManager.js'),
-  manager = new WemoManager('localhost', 5000),
+  manager = new WemoManager('192.168.1.98', 5000),
   user = require('../db/user.js');
 
 

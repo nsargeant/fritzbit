@@ -1,54 +1,67 @@
 app.controller('FritzbitController', function ($scope, fritzbitService) {
+
     $scope.display = {
-        credits: 1,
-        calories: 599,
-        steps: 543,
-        distance: 0.5
+        creditsTotal: 0,
+        creditsEarned: 0,
+        creditsUsed: 0,
+        calories: 0,
+        stepsTaken: 0,
+        steps: 543
     };
 
-    $scope.test = function () {
-        return 'This is a test';
-    };
+    angular.element(document).ready(function () {
+        $scope.getUsername();
+    });
 
     $scope.data = {};
-    $scope.steps = 0;
     $scope.credits = 0;
-    $scope.dirty = false;
     $scope.username = '';
+    $scope.creditsEarned = '';
+    $scope.wemoState = 'off';
+    $scope.wemoButtonMessage = 'Turn on WeMo';
 
-    $scope.flipDirty = function () {
-        console.log('It\'s dirty');
-        $scope.dirty = true;
-    };
-
-    $scope.flipClean = function () {
-        console.log('It\'s clean!');
-        $scope.dirty = false;
+    $scope.getInfo = function () {
+        if ($scope.username) {
+            fritzbitService.getInfoBlob($scope.username).then(function (data) {
+                console.log('data: ', data);
+                var dataBlob = data.data;
+                $scope.display.steps = dataBlob.website.ratio;
+                $scope.display.stepsTaken = dataBlob.info.summary.steps;
+                $scope.display.calories = dataBlob.info.summary.activityCalories;
+            });
+        }
     };
 
     $scope.getUsername = function () {
-        fritzbitService.getData().then(function (data) {
-            console.log('getData result: ', data);
+        fritzbitService.getUser().then(function (data) {
             $scope.username = data.data.fitbit;
-            console.log('username: ', $scope.username);
-            $scope.flipDirty();
+            $scope.getInfo();
         });
     };
 
-    $scope.postData = function () {
-        if ($scope.dirty) {
-            fritzbitService.postStepsPerCredit($scope.username,$scope.steps).then(function(data){
-                console.log('post result: ', data);
-            });
-            $scope.flipClean();
-        }
+    $scope.postStepsPerCredit = function () {
+        console.log('$scope.steps in postStepsPerCredit(): ', $scope.display.steps);
+        fritzbitService.postStepsPerCredit($scope.username, $scope.display.steps).then(function (data) {
+            console.log('post result: ', data);
+            $scope.display.creditsEarned = 500;
+        });
     };
 
-    setInterval(function () {
-        if (!$scope.username) {
-            $scope.getUsername();
+    $scope.toggleWemo = function() {
+        if ($scope.wemoState === 'off') {
+            $scope.wemoState = 'on';
+            $scope.wemoButtonMessage = 'Turn off WeMo';
         } else {
-            //$scope.postData();
+            $scope.wemoState = 'off';
+            $scope.wemoButtonMessage = 'Turn on WeMo';
         }
+
+        fritzbitService.toggleWemo($scope.username,$scope.wemoState).then(function(data){
+            console.log('toggleWemo() result: ', data);
+        });
+    };
+
+    setInterval(function() {
+        $scope.display.creditsTotal = $scope.display.creditsEarned = $scope.display.creditsUsed;
     }, 1500);
 });

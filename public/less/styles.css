@@ -1,3 +1,6 @@
+body .navbar-brand {
+  color: #93f7ff;
+}
 .jumbotron {
   margin-top: 80px;
   position: relative;

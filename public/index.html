@@ -49,25 +49,24 @@
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
 
-        <p><a href="/auth/fitbit" class="btn btn-primary btn-lg" role="button">Login to Fitbit</a></p>
-        <div class="panel panel-default">
+        <p ng-if="!username"><a href="/auth/fitbit" class="btn btn-primary btn-lg" role="button">Login to Fitbit</a></p>
+        <div class="panel panel-default" ng-if="username">
             <div class="panel-heading">
                 <h3 class="panel-title">Fitbit Data</h3>
             </div>
             <div class="panel-body">
                 <ul>
-                    <li>Total Credits: {{display.credits}}</li>
+                    <li>Credits remaining: {{display.creditsTotal}}</li>
                     <li>Calories burned: {{display.calories}}</li>
-                    <li>Steps taken: {{display.steps}}</li>
-                    <li>Distance traveled: {{display.distance}}</li>
-                    <li>Goal(steps): {{steps}}</li>
-                    <li>Data: {{data}}</li>
+                    <li>Steps taken: {{display.stepsTaken}}</li>
+                    <li>Goal(steps): {{numSteps}}</li>
                 </ul>
                 <div>
                     <label>
-                        <input type="text" ng-keyup="flipDirty()" ng-model="steps"> Steps per Credit
+                        <input type="text" ng-model="display.steps"> Steps per Credit
                     </label>
-                    <button ng-click="postData()">Submit Steps</button>
+                    <button ng-click="postStepsPerCredit()">Submit Steps</button>
+                    <button ng-click="toggleWemo()">{{wemoButtonMessage}}</button>
                 </div>
             </div>
 
@@ -84,7 +83,7 @@
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="../../dist/js/bootstrap.min.js"></script>
+<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="../../assets/js/docs.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
